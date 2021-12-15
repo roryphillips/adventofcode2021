@@ -1,28 +1,14 @@
-package interpreter
+package navigation
 
 import (
-	"adventofcode2021/internal/input"
+	"adventofcode2021/internal/utils/input"
 	"fmt"
 	"strconv"
 	"strings"
 )
 
-type CommandType uint32
-
-const (
-	CommandType_Unknown CommandType = iota
-	CommandType_Forward
-	CommandType_Up
-	CommandType_Down
-)
-
-type Command struct {
-	Cmd CommandType
-	Val int
-}
-
-func InterpretInput(path string) ([]Command, error) {
-	commands := []Command{}
+func OrdersFromFile(path string) ([]Order, error) {
+	orders := []Order{}
 
 	err := input.ReadFileLines(path, func(input string) error {
 		parts := strings.Split(input, " ")
@@ -36,28 +22,27 @@ func InterpretInput(path string) ([]Command, error) {
 			return fmt.Errorf("failed to convert val to int: %v", err)
 		}
 
-		command := Command{
-			Val: int(i),
+		order := Order{
+			Delta: int(i),
 		}
 		switch cmd {
 		case "forward":
-			command.Cmd = CommandType_Forward
+			order.Type = OrderTypeForward
 		case "down":
-			command.Cmd = CommandType_Down
+			order.Type = OrderTypeUp
 		case "up":
-			command.Cmd = CommandType_Up
+			order.Type = OrderTypeDown
 		default:
 			return fmt.Errorf("unknown command type: %v", cmd)
 		}
 
-		commands = append(commands, command)
+		orders = append(orders, order)
 
 		return nil
 	})
-
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file: %v", err)
 	}
 
-	return commands, nil
+	return orders, nil
 }
